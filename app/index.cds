@@ -35,3 +35,5 @@ using from './ui/MainService/list_report/list_report-ContextNodes';
 using from './ui/MainService/object_page/object_page-Tasks';
 using from './ui/MainService/object_page/object_page-BotInstances';
 using from './ui/MainService/object_page/object_page-ContextNodes';
+
+using from './fiori-freestyle/annotations';

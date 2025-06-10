@@ -1,0 +1,28 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <VBox height="50%">
+        <Toolbar>
+            <Title text="Task Tree" />
+        </Toolbar>
+        <ScrollContainer
+            height="100%"
+            vertical="true"
+            horizontal="false"
+        >
+            <Tree
+                id="TasksList"
+                mode="SingleSelectMaster"
+                items="{ path: 'Nodes>/Nodes'}"
+                itemPress=".onTasksSelect"
+                selectionChange=".onTasksSelect"
+            >
+                <StandardTreeItem
+                    title="{Nodes>text}"
+                    type="Active"
+                />
+            </Tree>
+        </ScrollContainer>
+    </VBox>
+</core:FragmentDefinition>

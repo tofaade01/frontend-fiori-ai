@@ -1,5 +1,5 @@
 sap.ui.define(["sap/fe/core/AppComponent"], (ac) =>
-    ac.extend("task-runtime.Component", {
+    ac.extend("fiori-freestyle.Component", {
         metadata: { manifest: "json" },
     })
 );

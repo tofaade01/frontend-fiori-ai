@@ -1,7 +1,7 @@
 {
     "_version": "1.8.0",
     "sap.app": {
-        "id": "task-runtime",
+        "id": "fiori-freestyle",
         "type": "application",
         "i18n": "i18n/i18n.properties",
         "applicationVersion": {
@@ -63,7 +63,7 @@
             "i18n": {
                 "type": "sap.ui.model.resource.ResourceModel",
                 "settings": {
-                    "bundleName": "task-runtime.i18n.i18n"
+                    "bundleName": "fiori-freestyle.i18n.i18n"
                 }
             },
             "": {
