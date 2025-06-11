@@ -18,10 +18,11 @@
           parameters: {
             arrayNames: ['children']
           }
-        }"
+        }" itemPress="onContextNodesSelect"
+                mode="SingleSelectMaster"
             >
                 <!-- each node rendered as a StandardTreeItem -->
-                <StandardTreeItem title="{tree>key}" />
+                <StandardTreeItem title="{tree>key}" type="Active"/>
             </Tree>
         </ScrollContainer>
     </VBox>

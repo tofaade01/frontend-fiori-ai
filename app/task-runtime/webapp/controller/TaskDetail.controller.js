@@ -4,6 +4,7 @@ sap.ui.define(
     "use strict";
 
     return Controller.extend("task-runtime.controller.TaskDetail", {
+      _sCsrfToken: null,
       onInit: function () {
         const oModel = this.getOwnerComponent().getModel();
         oModel
@@ -26,13 +27,79 @@ sap.ui.define(
                 .getData().results;
               this.buildContextTree(data);
 
-              //   const aTree = this._groupByPath(aData);
-              //   const oTreeModel = new JSONModel({ nodes: aTree });
-              //   this.getOwnerComponent().setModel(oTreeModel, "tree");
+                const aTree = this._groupByPath(aData);
+                const oTreeModel = new JSONModel({ nodes: aTree });
+                this.getOwnerComponent().setModel(oTreeModel, "tree");
             }.bind(this)
           );
+          const oUiModel = new JSONModel({
+          busy: false,
+          chatbot: {
+            txtInput: "",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are a helpful AI Assistant who can help user queries about SAP technologies. Graciously answer questions not related to SAP too.",
+              },
+            ],
+          },
+        });
+        this.getView().setModel(oUiModel, "ui");
+      },
+      onBtnChatbotSendPress: async function () {
+        const oUiModel = this.getView().getModel("ui");
+        const txtInput = oUiModel.getProperty("/chatbot/txtInput");
+        if (!txtInput) return;
+
+        const oMessages = [
+          ...oUiModel.getProperty("/chatbot/messages"),
+          {
+            role: "user",
+            content: txtInput,
+          },
+        ];
+
+        oUiModel.setProperty("/chatbot/messages", oMessages);
+        oUiModel.setProperty("/chatbot/txtInput", "");
+        oUiModel.setProperty("/busy", true);
+
+        const txtSummary = await this._apiChatLocal(oMessages);
+
+        oMessages.push({
+          role: "assistant",
+          content: txtSummary,
+        });
+
+        oUiModel.setProperty("/chatbot/messages", oMessages);
+        oUiModel.setProperty("/busy", false);
       },
 
+      _apiChatLocal: async function (oMessages) {
+        // this.byId("chatbotContent").setBusy(true);
+        const YOUR_API_KEY = `AIzaSyCLanfVnyrRSehsD4vAmbz2QypIFev1BFo`
+        const model = "models/gemini-2.0-flash"; // or "models/gemini-1.5-flash"
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${YOUR_API_KEY}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+            parts: oMessages.map((msg) => ({
+              text: msg.content,
+            })),
+          },
+            ]
+          }),
+        });
+        const resData = await res.json();
+        // this.byId("chatbotContent").setBusy(false);
+        return resData.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      },
+      
       buildContextTree: function (flatData) {
         // Result tree
         const treeData = {};
@@ -52,8 +119,6 @@ sap.ui.define(
           // Assign label-value pair
           current[item.label] = item.value;
         });
-
-        console.log(treeData);
 
         const aTree = this.prepareTreeArray(treeData);
         const oTreeModel = new JSONModel({ nodes: aTree });
@@ -85,11 +150,13 @@ sap.ui.define(
           }
           // push each label/value as a leaf node
           map[pathKey].children.push({
+            id: item.ID,
             key: item.label,
             value: item.value,
             children: [],
           });
         });
+        console.log("map", map);
         // return array of all grouped nodes
         return Object.values(map);
       },
@@ -103,7 +170,7 @@ sap.ui.define(
       // This is Detail page
       onContextNodesSelect: function () {
         // Get the reference to the author list control by its ID
-        const oList = this.byId("ContextNodesList");
+        const oList = this.byId("docTree");
 
         // Get the currently selected item (author) from the list
         const oContextNodeSelected = oList.getSelectedItem();
@@ -115,9 +182,8 @@ sap.ui.define(
 
         // Retrieve the ID of the selected author from its binding context
         const sContextNodeId = oContextNodeSelected
-          .getBindingContext()
-          .getProperty("ID");
-        console.log(sContextNodeId);
+          .getBindingContext("tree")
+          .getProperty("id");
         // Call a private function to bind and display books related to the selected author
         this._bindContextNode(sContextNodeId);
       },
@@ -130,7 +196,7 @@ sap.ui.define(
         // If no author ID is provided, unbind the table and exit
         if (!sContextNodeId) {
           oForm.setVisible(false);
-          oForm.unbindItems();
+          oForm.unbindElement();
           return;
         } else {
           oForm.setVisible(true);

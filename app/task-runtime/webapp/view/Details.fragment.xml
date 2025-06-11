@@ -1,8 +1,92 @@
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
->
+    xmlns:f="sap.f"
+    xmlns:l="sap.ui.layout"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:mvc="sap.ui.core.mvc">
+    
     <Toolbar>
         <Title text="Details" />
     </Toolbar>
+    <l:VerticalLayout width="90%">
+        <!-- Chat Section - Fixed Height -->
+        <l:VerticalLayout
+            width="100%"
+            class="topSection"
+        >
+            <Title
+                text="AI Chat"
+                level="H4"
+                class="aiChatTitle"
+            />
+
+
+        <l:Splitter>
+            <VBox class="chat-bot-ui">
+                <ScrollContainer height="100%" width="100%" vertical="true" focusable="true">
+                    <MessageStrip
+                        text="Hello, I am DeepJoan. Ask me anything"
+                        type="Success"
+                        showIcon="true"
+                        showCloseButton="false"
+                        class="sapUiMediumMarginBottom" />
+
+                    <VBox items="{ui>/chatbot/messages}">
+                        <VBox>
+                            <HBox visible="{= ${ui>role} === 'assistant'}" direction="Row" class="sapUiSmallMarginTopBottom">
+                                <HBox backgroundDesign="Solid" class="chatBubble sapUiResponsivePadding">
+                                    <core:Icon decorative="true" src="sap-icon://ai" class="sapUiTinyMarginEnd" />
+                                    <Text text="{ui>content}" />
+                                    <Text width="2rem" />
+                                    <Button class="sapUiTinyMarginBegin"
+                                        type="Emphasized"
+                                        icon="sap-icon://thumb-up"
+                                        text="Adopt"
+                                        press="onBtnChatbotSendPress"
+                                        busy="{ui>/busy}"
+                                        busyIndicatorDelay="0" />
+                                </HBox>
+                            </HBox>
+
+                            <HBox visible="{= ${ui>role} === 'user'}" direction="RowReverse" class="sapUiSmallMarginTopBottom">
+                                <HBox direction="RowReverse"
+                                    backgroundDesign="Solid"
+                                    class="chatBubble sapUiResponsivePadding sapThemeBrand-asBackgroundColor">
+                                    <core:Icon decorative="true" src="sap-icon://customer" class="sapUiTinyMarginBegin sapThemeTextInverted" />
+                                    <Text class="sapThemeTextInverted" text="{ui>content}" />
+                                </HBox>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </ScrollContainer>
+
+                <HBox class="sapUiSmallMarginTop">
+                    <TextArea value="{ui>/chatbot/txtInput}"
+                        width="100%"
+                        growing="true"
+                        editable="{= !${ui>/busy}}"
+                        busyIndicatorDelay="0">
+                        <layoutData>
+                            <FlexItemData growFactor="1" />
+                        </layoutData>
+                    </TextArea>
+
+                    <Button class="sapUiTinyMarginBegin"
+                        type="Emphasized"
+                        icon="sap-icon://paper-plane"
+                        text="Send"
+                        press="onBtnChatbotSendPress"
+                        busy="{ui>/busy}"
+                        busyIndicatorDelay="0" />
+                </HBox>
+
+                <layoutData>
+                    <l:SplitterLayoutData size="auto" />
+                </layoutData>
+            </VBox>
+        </l:Splitter>
+    </l:VerticalLayout>
+    </l:VerticalLayout>
 </core:FragmentDefinition>

@@ -21,6 +21,12 @@
 
         <Label text="Type" />
         <Text text="{type}" />
+        
+        <Label text="Value" />
+        <Text text="{value}" />
+
+        <Label text="Path" />
+        <Text text="{path}" />
     </forms:SimpleForm>
 
     <forms:SimpleForm
